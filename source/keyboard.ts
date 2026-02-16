@@ -6,12 +6,13 @@ import {
 	type ContextPathFunc,
 } from './generic-types.ts';
 import {combinePath} from './path.ts';
+import type {ButtonStyle} from "./buttons/types.js";
 
 export type CallbackButtonTemplate = {
 	readonly text: string;
 	readonly relativePath: string;
 	readonly icon_custom_emoji_id?: string;
-	readonly style?: 'danger' | 'success' | 'primary';
+	readonly style?: ButtonStyle;
 };
 
 export type InlineKeyboardButton = ReadonlyDeep<TelegramInlineKeyboardButton>;

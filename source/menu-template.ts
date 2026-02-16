@@ -154,9 +154,9 @@ export class MenuTemplate<Context> {
 				? await options.copy_text(context, path)
 				: options.copy_text;
 			const icon_custom_emoji_id
-				= typeof options.icon_custom_emoji_id === 'function'
-					? await options.icon_custom_emoji_id(context, path)
-					: options.icon_custom_emoji_id;
+				= typeof options.iconCustomEmojiId === 'function'
+					? await options.iconCustomEmojiId(context, path)
+					: options.iconCustomEmojiId;
 			const style = typeof options.style === 'function'
 				? await options.style(context, path)
 				: options.style;
@@ -185,9 +185,9 @@ export class MenuTemplate<Context> {
 				? await options.url(context, path)
 				: options.url;
 			const icon_custom_emoji_id
-				= typeof options.icon_custom_emoji_id === 'function'
-					? await options.icon_custom_emoji_id(context, path)
-					: options.icon_custom_emoji_id;
+				= typeof options.iconCustomEmojiId === 'function'
+					? await options.iconCustomEmojiId(context, path)
+					: options.iconCustomEmojiId;
 			const style = typeof options.style === 'function'
 				? await options.style(context, path)
 				: options.style;
@@ -216,9 +216,9 @@ export class MenuTemplate<Context> {
 				? await options.query(context, path)
 				: options.query;
 			const icon_custom_emoji_id
-				= typeof options.icon_custom_emoji_id === 'function'
-					? await options.icon_custom_emoji_id(context, path)
-					: options.icon_custom_emoji_id;
+				= typeof options.iconCustomEmojiId === 'function'
+					? await options.iconCustomEmojiId(context, path)
+					: options.iconCustomEmojiId;
 			const style = typeof options.style === 'function'
 				? await options.style(context, path)
 				: options.style;
@@ -248,9 +248,9 @@ export class MenuTemplate<Context> {
 					? await options.query(context, path)
 					: options.query;
 			const icon_custom_emoji_id
-				= typeof options.icon_custom_emoji_id === 'function'
-					? await options.icon_custom_emoji_id(context, path)
-					: options.icon_custom_emoji_id;
+				= typeof options.iconCustomEmojiId === 'function'
+					? await options.iconCustomEmojiId(context, path)
+					: options.iconCustomEmojiId;
 			const style = typeof options.style === 'function'
 				? await options.style(context, path)
 				: options.style;
@@ -648,9 +648,9 @@ function generateCallbackButtonTemplate<Context>(
 			? await options.text(context, path)
 			: options.text;
 		const icon_custom_emoji_id
-			= typeof options.icon_custom_emoji_id === 'function'
-				? await options.icon_custom_emoji_id(context, path)
-				: options.icon_custom_emoji_id;
+			= typeof options.iconCustomEmojiId === 'function'
+				? await options.iconCustomEmojiId(context, path)
+				: options.iconCustomEmojiId;
 		const style = typeof options.style === 'function'
 			? await options.style(context, path)
 			: options.style;

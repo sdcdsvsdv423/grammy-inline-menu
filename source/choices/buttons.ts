@@ -1,16 +1,8 @@
-import {
-	getButtonsAsRows,
-	getButtonsOfPage,
-	maximumButtonsPerPage,
-} from '../buttons/align.ts';
+import {getButtonsAsRows, getButtonsOfPage, maximumButtonsPerPage,} from '../buttons/align.ts';
 import {createPaginationChoices} from '../buttons/pagination.ts';
 import type {CallbackButtonTemplate} from '../keyboard.ts';
 import type {Choices, ChoiceTextFunc, ManyChoicesOptions} from './types.ts';
-import {
-	ensureCorrectChoiceKeys,
-	getChoiceKeysFromChoices,
-	getChoiceTextByKey,
-} from './understand-choices.ts';
+import {ensureCorrectChoiceKeys, getChoiceKeysFromChoices, getChoiceTextByKey,} from './understand-choices.ts';
 
 export function generateChoicesButtons<Context>(
 	uniqueIdentifierPrefix: string,
@@ -40,9 +32,17 @@ export function generateChoicesButtons<Context>(
 		);
 		const buttonsOfPage = await Promise.all(keysOfPage.map(async key => {
 			const text = await textFunction(context, key);
+			const iconCustomEmojiId = typeof options.iconCustomEmojiId === 'function' ? await options.iconCustomEmojiId(context, key) : options.iconCustomEmojiId;
+			const style = typeof options.style === 'function' ? await options.style(context, key) : options.style;
 			const relativePath = uniqueIdentifierPrefix + ':' + key
 				+ (isSubmenu ? '/' : '');
-			return {text, relativePath};
+
+			return {
+				text,
+				relativePath,
+				...(iconCustomEmojiId ? {icon_custom_emoji_id: iconCustomEmojiId} : {}),
+				...(style ? {style} : {})
+			};
 		}));
 		const rows = getButtonsAsRows(buttonsOfPage, options.columns);
 
@@ -75,6 +75,8 @@ export function generateChoicesPaginationButtons<Context>(
 	const pageButtons = pageKeys.map((page): CallbackButtonTemplate => ({
 		relativePath: `${uniqueIdentifierPrefix}P:${page}`,
 		text: pageRecord[page]!,
+		icon_custom_emoji_id: undefined,
+		style: undefined,
 	}));
 
 	return pageButtons;

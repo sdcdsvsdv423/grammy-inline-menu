@@ -1,9 +1,7 @@
 import type {CopyTextButton} from 'grammy/types';
 import type {ActionFunc} from '../action-hive.ts';
-import type {
-	ConstOrContextPathFunc,
-	ContextPathFunc,
-} from '../generic-types.ts';
+import type {ConstOrContextPathFunc, ContextPathFunc,} from '../generic-types.ts';
+import type {ButtonStyle} from "./types.js";
 
 export interface BasicOptions<Context> {
 	/** Return true when the button(s) should be hidden and not to be called */
@@ -21,10 +19,10 @@ export interface SingleButtonOptions<Context>
 	readonly text: ConstOrContextPathFunc<Context, string>;
 
 	/** Custom Emoji shown before the text of the button */
-	readonly icon_custom_emoji_id?: ConstOrContextPathFunc<Context, string>;
+	readonly iconCustomEmojiId?: ConstOrContextPathFunc<Context, string | null>;
 
 	/** Visual button style */
-	readonly style?: ConstOrContextPathFunc<Context, 'danger' | 'success' | 'primary'>;
+	readonly style?: ConstOrContextPathFunc<Context, ButtonStyle | null>;
 }
 
 export type ManualButtonOptions<Context> =

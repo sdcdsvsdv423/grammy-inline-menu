@@ -3,14 +3,12 @@ import {
 	generateChoicesPaginationButtons,
 	type ManyChoicesOptions,
 } from '../choices/index.ts';
-import {
-	ensureCorrectChoiceKeys,
-	getChoiceKeysFromChoices,
-} from '../choices/understand-choices.ts';
+import {ensureCorrectChoiceKeys, getChoiceKeysFromChoices,} from '../choices/understand-choices.ts';
 import type {ConstOrPromise} from '../generic-types.ts';
 import type {CallbackButtonTemplate} from '../keyboard.ts';
 import {prefixEmoji} from '../prefix.ts';
 import {getButtonsAsRows, getButtonsOfPage} from './align.ts';
+import type {ButtonInfo} from "./types.js";
 
 export type IsSetFunction<Context> = (
 	context: Context,
@@ -26,7 +24,7 @@ export type FormatStateFunction<Context> = (
 	textResult: string,
 	state: boolean,
 	key: string,
-) => ConstOrPromise<string>;
+) => ConstOrPromise<string | ButtonInfo>;
 
 export interface SelectOptions<Context> extends ManyChoicesOptions<Context> {
 	/**
@@ -81,11 +79,27 @@ export function generateSelectButtons<Context>(
 		const buttonsOfPage = await Promise.all(keysOfPage.map(async key => {
 			const textResult = await textFunction(context, key);
 			const state = await options.isSet(context, key);
-			const text = await formatFunction(context, textResult, state, key);
+
+			const formatted = await formatFunction(context, textResult, state, key);
+			const normalized = typeof formatted === 'string' ? {text: formatted} : formatted;
+
+			const iconCustomEmojiId = normalized.iconCustomEmojiId != null ? normalized.iconCustomEmojiId :
+				typeof options.iconCustomEmojiId === 'function'
+					? await options.iconCustomEmojiId(context, key)
+					: options.iconCustomEmojiId;
+			const style = normalized.style != null ? normalized.style :
+				typeof options.style === 'function'
+					? await options.style(context, key)
+					: options.style;
 
 			const dropinLetter = state ? 'F' : 'T';
 			const relativePath = uniqueIdentifierPrefix + dropinLetter + ':' + key;
-			return {text, relativePath};
+			return {
+				text: normalized.text,
+				relativePath,
+				...(iconCustomEmojiId ? {icon_custom_emoji_id: iconCustomEmojiId} : {}),
+				...(style ? {style} : {})
+			};
 		}));
 		const rows = getButtonsAsRows(buttonsOfPage, options.columns);
 

@@ -2,13 +2,14 @@ import type {ConstOrPromise, ContextPathFunc} from '../generic-types.ts';
 import type {CallbackButtonTemplate} from '../keyboard.ts';
 import {prefixEmoji} from '../prefix.ts';
 import type {SingleButtonOptions} from './basic.ts';
+import type {ButtonInfo} from "./types.js";
 
 export type FormatStateFunction<Context> = (
 	context: Context,
 	text: string,
 	state: boolean,
 	path: string,
-) => ConstOrPromise<string>;
+) => ConstOrPromise<string | ButtonInfo>;
 
 export interface ToggleOptions<Context> extends SingleButtonOptions<Context> {
 	/** Function returning the current state. */
@@ -31,6 +32,7 @@ export function generateToggleButton<Context>(
 ): ContextPathFunc<Context, CallbackButtonTemplate | undefined> {
 	const formatFunction: FormatStateFunction<Context> = options.formatState
 		?? ((_, text, state) => prefixEmoji(text, state));
+
 	return async (context, path) => {
 		if (await options.hide?.(context, path)) {
 			return undefined;
@@ -41,18 +43,22 @@ export function generateToggleButton<Context>(
 			: options.text;
 		const state = await options.isSet(context, path);
 
-		const icon_custom_emoji_id
-			= typeof options.icon_custom_emoji_id === 'function'
-				? await options.icon_custom_emoji_id(context, path)
-				: options.icon_custom_emoji_id;
-		const style = typeof options.style === 'function'
-			? await options.style(context, path)
-			: options.style;
+		const formatted = await formatFunction(context, textResult, state, path);
+		const normalized = typeof formatted === 'string' ? {text: formatted} : formatted;
+
+		const iconCustomEmojiId = normalized.iconCustomEmojiId != null ? normalized.iconCustomEmojiId :
+			typeof options.iconCustomEmojiId === 'function'
+				? await options.iconCustomEmojiId(context, path)
+				: options.iconCustomEmojiId;
+		const style = normalized.style != null ? normalized.style :
+			typeof options.style === 'function'
+				? await options.style(context, path)
+				: options.style;
 
 		return {
-			text: await formatFunction(context, textResult, state, path),
+			text: normalized.text,
 			relativePath: uniqueIdentifierPrefix + ':' + (state ? 'false' : 'true'),
-			...(icon_custom_emoji_id ? {icon_custom_emoji_id} : {}),
+			...(iconCustomEmojiId ? {icon_custom_emoji_id: iconCustomEmojiId} : {}),
 			...(style ? {style} : {}),
 		};
 	};
