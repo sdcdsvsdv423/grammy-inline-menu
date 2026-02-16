@@ -29,6 +29,7 @@
 	},
 	"scripts": {
 		"build": "del-cli dist && tsc",
+		"prepare": "npm run build",
 		"prepack": "npm run build",
 		"preexample-js": "npm run build",
 		"start": "tsc --sourceMap && node --enable-source-maps dist/examples/main.js",
