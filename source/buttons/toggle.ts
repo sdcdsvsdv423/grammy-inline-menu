@@ -1,8 +1,8 @@
-import type {ConstOrPromise, ContextPathFunc} from '../generic-types.ts';
+import type {ConstOrContextPathFunc, ConstOrPromise, ContextPathFunc} from '../generic-types.ts';
 import type {CallbackButtonTemplate} from '../keyboard.ts';
 import {prefixEmoji} from '../prefix.ts';
 import type {SingleButtonOptions} from './basic.ts';
-import type {ButtonInfo} from "./types.js";
+import type {ButtonIcon, ButtonIconValue, ButtonInfo} from "./types.js";
 
 export type FormatStateFunction<Context> = (
 	context: Context,
@@ -26,6 +26,47 @@ export interface ToggleOptions<Context> extends SingleButtonOptions<Context> {
 	readonly formatState?: FormatStateFunction<Context>;
 }
 
+function normalizeButtonIcon(icon: ButtonIconValue | undefined): ButtonIcon | null {
+	if (icon == null || icon === '') {
+		return null;
+	}
+
+	if (typeof icon === 'string') {
+		return {
+			iconCustomEmojiId: icon,
+		};
+	}
+
+	return icon;
+}
+
+async function resolveButtonIconOption<Context>(
+	context: Context,
+	path: string,
+	buttonIcon: ConstOrContextPathFunc<Context, ButtonIconValue> | undefined,
+): Promise<ButtonIconValue | undefined> {
+	return typeof buttonIcon === 'function'
+		? await buttonIcon(context, path)
+		: buttonIcon;
+}
+
+async function resolveToggleButtonIcon<Context>(
+	context: Context,
+	path: string,
+	normalized: ButtonInfo,
+	options: ToggleOptions<Context>,
+): Promise<ButtonIcon | null> {
+	const buttonIconInput = normalized.buttonIcon !== undefined
+		? normalized.buttonIcon
+		: normalized.iconCustomEmojiId != null
+			? normalized.iconCustomEmojiId
+			: options.buttonIcon !== undefined
+				? await resolveButtonIconOption(context, path, options.buttonIcon)
+				: await resolveButtonIconOption(context, path, options.iconCustomEmojiId);
+
+	return normalizeButtonIcon(buttonIconInput);
+}
+
 export function generateToggleButton<Context>(
 	uniqueIdentifierPrefix: string,
 	options: ToggleOptions<Context>,
@@ -46,19 +87,24 @@ export function generateToggleButton<Context>(
 		const formatted = await formatFunction(context, textResult, state, path);
 		const normalized = typeof formatted === 'string' ? {text: formatted} : formatted;
 
-		const iconCustomEmojiId = normalized.iconCustomEmojiId != null ? normalized.iconCustomEmojiId :
-			typeof options.iconCustomEmojiId === 'function'
-				? await options.iconCustomEmojiId(context, path)
-				: options.iconCustomEmojiId;
+		const buttonIcon = await resolveToggleButtonIcon(
+			context,
+			path,
+			normalized,
+			options,
+		);
+
 		const style = normalized.style != null ? normalized.style :
 			typeof options.style === 'function'
 				? await options.style(context, path)
 				: options.style;
 
 		return {
-			text: normalized.text,
+			text: buttonIcon?.fallbackEmoji
+				? buttonIcon.fallbackEmoji + ' ' + normalized.text
+				: normalized.text,
 			relativePath: uniqueIdentifierPrefix + ':' + (state ? 'false' : 'true'),
-			...(iconCustomEmojiId ? {icon_custom_emoji_id: iconCustomEmojiId} : {}),
+			...(buttonIcon?.iconCustomEmojiId ? {icon_custom_emoji_id: buttonIcon.iconCustomEmojiId} : {}),
 			...(style ? {style} : {}),
 		};
 	};

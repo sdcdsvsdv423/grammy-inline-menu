@@ -1,8 +1,4 @@
-import {
-	type ActionFunc,
-	ActionHive,
-	type ButtonAction,
-} from './action-hive.ts';
+import {type ActionFunc, ActionHive, type ButtonAction,} from './action-hive.ts';
 import type {Body} from './body.ts';
 import type {
 	CopyTextButtonOptions,
@@ -13,28 +9,12 @@ import type {
 	UrlButtonOptions,
 } from './buttons/basic.ts';
 import type {ChooseOptions} from './buttons/choose.ts';
-import {
-	createPaginationChoices,
-	type PaginationOptions,
-	type SetPageFunction,
-} from './buttons/pagination.ts';
+import {createPaginationChoices, type PaginationOptions, type SetPageFunction,} from './buttons/pagination.ts';
 import {generateSelectButtons, type SelectOptions} from './buttons/select.ts';
-import type {
-	ChooseIntoSubmenuOptions,
-	SubmenuOptions,
-} from './buttons/submenu.ts';
+import type {ChooseIntoSubmenuOptions, SubmenuOptions,} from './buttons/submenu.ts';
 import {generateToggleButton, type ToggleOptions} from './buttons/toggle.ts';
-import {
-	type ChoicesRecord,
-	combineHideAndChoices,
-	generateChoicesButtons,
-} from './choices/index.ts';
-import type {
-	ConstOrContextPathFunc,
-	ContextFunc,
-	ContextPathFunc,
-	RegExpLike,
-} from './generic-types.ts';
+import {type ChoicesRecord, combineHideAndChoices, generateChoicesButtons,} from './choices/index.ts';
+import type {ConstOrContextPathFunc, ContextFunc, ContextPathFunc, RegExpLike,} from './generic-types.ts';
 import {
 	type ButtonTemplate,
 	type ButtonTemplateRow,
@@ -44,6 +24,7 @@ import {
 } from './keyboard.ts';
 import type {MenuLike, Submenu} from './menu-like.ts';
 import {ensureTriggerChild} from './path.ts';
+import type {ButtonIcon, ButtonIconValue} from "./buttons/types.ts";
 
 export class MenuTemplate<Context> {
 	readonly #body: ContextPathFunc<Context, Body>;
@@ -155,8 +136,8 @@ export class MenuTemplate<Context> {
 				: options.copy_text;
 			const icon_custom_emoji_id
 				= typeof options.iconCustomEmojiId === 'function'
-					? await options.iconCustomEmojiId(context, path)
-					: options.iconCustomEmojiId;
+				? await options.iconCustomEmojiId(context, path)
+				: options.iconCustomEmojiId;
 			const style = typeof options.style === 'function'
 				? await options.style(context, path)
 				: options.style;
@@ -186,8 +167,8 @@ export class MenuTemplate<Context> {
 				: options.url;
 			const icon_custom_emoji_id
 				= typeof options.iconCustomEmojiId === 'function'
-					? await options.iconCustomEmojiId(context, path)
-					: options.iconCustomEmojiId;
+				? await options.iconCustomEmojiId(context, path)
+				: options.iconCustomEmojiId;
 			const style = typeof options.style === 'function'
 				? await options.style(context, path)
 				: options.style;
@@ -217,8 +198,8 @@ export class MenuTemplate<Context> {
 				: options.query;
 			const icon_custom_emoji_id
 				= typeof options.iconCustomEmojiId === 'function'
-					? await options.iconCustomEmojiId(context, path)
-					: options.iconCustomEmojiId;
+				? await options.iconCustomEmojiId(context, path)
+				: options.iconCustomEmojiId;
 			const style = typeof options.style === 'function'
 				? await options.style(context, path)
 				: options.style;
@@ -245,12 +226,12 @@ export class MenuTemplate<Context> {
 				: options.text;
 			const switch_inline_query_current_chat
 				= typeof options.query === 'function'
-					? await options.query(context, path)
-					: options.query;
+				? await options.query(context, path)
+				: options.query;
 			const icon_custom_emoji_id
 				= typeof options.iconCustomEmojiId === 'function'
-					? await options.iconCustomEmojiId(context, path)
-					: options.iconCustomEmojiId;
+				? await options.iconCustomEmojiId(context, path)
+				: options.iconCustomEmojiId;
 			const style = typeof options.style === 'function'
 				? await options.style(context, path)
 				: options.style;
@@ -635,6 +616,20 @@ export class MenuTemplate<Context> {
 	}
 }
 
+function normalizeButtonIcon(icon: ButtonIconValue | undefined): ButtonIcon | null {
+	if (!icon) {
+		return null;
+	}
+
+	if (typeof icon === 'string') {
+		return {
+			iconCustomEmojiId: icon,
+		};
+	}
+
+	return icon;
+}
+
 function generateCallbackButtonTemplate<Context>(
 	relativePath: string,
 	options: SingleButtonOptions<Context>,
@@ -647,17 +642,27 @@ function generateCallbackButtonTemplate<Context>(
 		const text = typeof options.text === 'function'
 			? await options.text(context, path)
 			: options.text;
-		const icon_custom_emoji_id
-			= typeof options.iconCustomEmojiId === 'function'
+
+		const buttonIconInput = options.buttonIcon !== undefined
+			? typeof options.buttonIcon === 'function'
+				? await options.buttonIcon(context, path)
+				: options.buttonIcon
+			: typeof options.iconCustomEmojiId === 'function'
 				? await options.iconCustomEmojiId(context, path)
 				: options.iconCustomEmojiId;
+
+		const buttonIcon = normalizeButtonIcon(buttonIconInput);
+
 		const style = typeof options.style === 'function'
 			? await options.style(context, path)
 			: options.style;
+
 		return {
 			relativePath,
-			text,
-			...(icon_custom_emoji_id ? {icon_custom_emoji_id} : {}),
+			text: buttonIcon?.fallbackEmoji
+				? buttonIcon.fallbackEmoji + ' ' + text
+				: text,
+			...(buttonIcon?.iconCustomEmojiId ? {icon_custom_emoji_id: buttonIcon.iconCustomEmojiId} : {}),
 			...(style ? {style} : {}),
 		};
 	};

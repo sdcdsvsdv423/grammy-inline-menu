@@ -62,17 +62,22 @@ export function generateChoicesButtons<Context>(
 			const icon = await resolveButtonIcon(
 				context,
 				key,
-				options.buttonIcon !== undefined ? options.buttonIcon : options.iconCustomEmojiId,
+				options.buttonIcon !== undefined
+					? options.buttonIcon
+					: options.iconCustomEmojiId,
 			);
-			const style = typeof options.style === 'function' ? await options.style(context, key) : options.style;
+			const style = typeof options.style === 'function'
+				? await options.style(context, key)
+				: options.style;
 			const relativePath = uniqueIdentifierPrefix + ':' + key
 				+ (isSubmenu ? '/' : '');
 
 			return {
-				text,
+				text: icon?.fallbackEmoji
+					? icon.fallbackEmoji + ' ' + text
+					: text,
 				relativePath,
 				...(icon?.iconCustomEmojiId ? {icon_custom_emoji_id: icon.iconCustomEmojiId} : {}),
-				...(icon?.fallbackEmoji ? {fallback_emoji: icon.fallbackEmoji} : {}),
 				...(style ? {style} : {}),
 			};
 		}));
