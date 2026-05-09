@@ -3,6 +3,33 @@ import {createPaginationChoices} from '../buttons/pagination.ts';
 import type {CallbackButtonTemplate} from '../keyboard.ts';
 import type {Choices, ChoiceTextFunc, ManyChoicesOptions} from './types.ts';
 import {ensureCorrectChoiceKeys, getChoiceKeysFromChoices, getChoiceTextByKey,} from './understand-choices.ts';
+import type {ButtonIcon, ButtonIconValue, ChoiceIconFunc} from "../buttons/types.ts";
+
+function normalizeButtonIcon(icon: ButtonIconValue | undefined): ButtonIcon | null {
+	if (!icon) {
+		return null;
+	}
+
+	if (typeof icon === 'string') {
+		return {
+			iconCustomEmojiId: icon,
+		};
+	}
+
+	return icon;
+}
+
+async function resolveButtonIcon<Context>(
+	context: Context,
+	key: string,
+	icon: ChoiceIconFunc<Context> | undefined,
+): Promise<ButtonIcon | null> {
+	const resolvedIcon = typeof icon === 'function'
+		? await icon(context, key)
+		: icon;
+
+	return normalizeButtonIcon(resolvedIcon);
+}
 
 export function generateChoicesButtons<Context>(
 	uniqueIdentifierPrefix: string,
@@ -32,7 +59,11 @@ export function generateChoicesButtons<Context>(
 		);
 		const buttonsOfPage = await Promise.all(keysOfPage.map(async key => {
 			const text = await textFunction(context, key);
-			const iconCustomEmojiId = typeof options.iconCustomEmojiId === 'function' ? await options.iconCustomEmojiId(context, key) : options.iconCustomEmojiId;
+			const icon = await resolveButtonIcon(
+				context,
+				key,
+				options.buttonIcon !== undefined ? options.buttonIcon : options.iconCustomEmojiId,
+			);
 			const style = typeof options.style === 'function' ? await options.style(context, key) : options.style;
 			const relativePath = uniqueIdentifierPrefix + ':' + key
 				+ (isSubmenu ? '/' : '');
@@ -40,8 +71,9 @@ export function generateChoicesButtons<Context>(
 			return {
 				text,
 				relativePath,
-				...(iconCustomEmojiId ? {icon_custom_emoji_id: iconCustomEmojiId} : {}),
-				...(style ? {style} : {})
+				...(icon?.iconCustomEmojiId ? {icon_custom_emoji_id: icon.iconCustomEmojiId} : {}),
+				...(icon?.fallbackEmoji ? {fallback_emoji: icon.fallbackEmoji} : {}),
+				...(style ? {style} : {}),
 			};
 		}));
 		const rows = getButtonsAsRows(buttonsOfPage, options.columns);

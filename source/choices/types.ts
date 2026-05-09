@@ -1,7 +1,7 @@
 import type {BasicOptions} from '../buttons/basic.ts';
 import type {GenericPaginationOptions} from '../buttons/pagination.ts';
 import type {ConstOrContextFunc, ConstOrPromise} from '../generic-types.ts';
-import type {ButtonStyle} from "../buttons/types.js";
+import type {ButtonStyle, ChoiceIconFunc} from "../buttons/types.js";
 
 export type Choice = string | number;
 export type ChoiceText = string;
@@ -56,7 +56,14 @@ export interface ManyChoicesOptions<Context>
 	/** Function which has to return the text the user will see on the button of a given choice */
 	readonly buttonText?: ChoiceTextFunc<Context>;
 
-	/** Function which has to return the custom emoji id the user will see on the button of a given choice */
+	/** Function which has to return the icon the user will see on the button of a given choice */
+	readonly buttonIcon?: ChoiceIconFunc<Context>;
+
+	/**
+	 * Function which has to return the custom emoji id the user will see on the button of a given choice.
+	 *
+	 * @deprecated Use `icon` instead.
+	 */
 	readonly iconCustomEmojiId?: ChoiceIconCustomIdFunc<Context>;
 
 	/** Function which has to return the style the user will see on the button of a given choice */
