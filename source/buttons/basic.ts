@@ -50,7 +50,7 @@ export interface UrlButtonOptions<Context>
 export interface WebAppButtonOptions<Context>
 	extends SingleButtonOptions<Context> {
 	/** Description of the Web App launched when the button is pressed */
-	readonly web_app: ConstOrContextPathFunc<Context, Readonly<WebAppInfo>>;
+	readonly webApp: ConstOrContextPathFunc<Context, Readonly<WebAppInfo>>;
 }
 
 export interface SwitchToChatOptions<Context>

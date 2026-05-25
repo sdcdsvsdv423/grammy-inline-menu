@@ -186,7 +186,7 @@ export class MenuTemplate<Context> {
 	 * @example
 	 * menuTemplate.webApp({
 	 *   text: 'Open app',
-	 *   web_app: { url: 'https://example.com/app' },
+	 *   webApp: { url: 'https://example.com/app' },
 	 * });
 	 */
 	webApp(options: WebAppButtonOptions<Context>): void {

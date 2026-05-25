@@ -107,13 +107,13 @@ await test('menu-template other-buttons url hidden', async () => {
 
 await test('menu-template other-buttons web_app', async () => {
 	const menu = new MenuTemplate('whatever');
-	menu.webApp({text: 'Button', web_app: {url: 'https://example.com/app'}});
+	menu.webApp({text: 'Button', webApp: {url: 'https://example.com/app'}});
 	const keyboard = await menu.renderKeyboard(undefined, '/');
 	deepStrictEqual(keyboard, [
 		[
 			{
 				text: 'Button',
-				web_app: {url: 'https://example.com/app'},
+				webApp: {url: 'https://example.com/app'},
 			},
 		],
 	]);
@@ -138,7 +138,7 @@ await test('menu-template other-buttons web_app functions', async () => {
 		[
 			{
 				text: 'Button',
-				web_app: {url: 'https://example.com/app'},
+				webApp: {url: 'https://example.com/app'},
 			},
 		],
 	]);
@@ -148,7 +148,7 @@ await test('menu-template other-buttons web_app hidden', async () => {
 	const menu = new MenuTemplate('whatever');
 	menu.webApp({
 		text: 'Button',
-		web_app: {url: 'https://example.com/app'},
+		webApp: {url: 'https://example.com/app'},
 		hide: () => true,
 	});
 	const keyboard = await menu.renderKeyboard(undefined, '/');
