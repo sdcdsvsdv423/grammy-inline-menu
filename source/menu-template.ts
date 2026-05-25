@@ -194,9 +194,9 @@ export class MenuTemplate<Context> {
 			const text = typeof options.text === 'function'
 				? await options.text(context, path)
 				: options.text;
-			const web_app = typeof options.web_app === 'function'
-				? await options.web_app(context, path)
-				: options.web_app;
+			const web_app = typeof options.webApp === 'function'
+				? await options.webApp(context, path)
+				: options.webApp;
 			const icon_custom_emoji_id
 				= typeof options.iconCustomEmojiId === 'function'
 				? await options.iconCustomEmojiId(context, path)

@@ -1,10 +1,7 @@
 import {Buffer} from 'node:buffer';
 import type {InlineKeyboardButton as TelegramInlineKeyboardButton} from 'grammy/types';
 import type {ReadonlyDeep} from 'type-fest';
-import {
-	type ConstOrContextPathFunc,
-	type ContextPathFunc,
-} from './generic-types.ts';
+import {type ConstOrContextPathFunc, type ContextPathFunc,} from './generic-types.ts';
 import {combinePath} from './path.ts';
 import type {ButtonStyle} from "./buttons/types.js";
 

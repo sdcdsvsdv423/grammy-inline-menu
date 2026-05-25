@@ -127,7 +127,7 @@ await test('menu-template other-buttons web_app functions', async () => {
 			strictEqual(path, '/');
 			return 'Button';
 		},
-		web_app(context, path) {
+		webApp(context, path) {
 			strictEqual(context, 'foo');
 			strictEqual(path, '/');
 			return {url: 'https://example.com/app'};
