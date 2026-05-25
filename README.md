@@ -259,6 +259,12 @@ menuTemplate.interact("unique", {
 menuTemplate.url({ text: "Text", url: "https://edjopato.de" });
 ```
 
+### How can I show a Web App button?
+
+```ts
+menuTemplate.webApp({ text: "Open app", web_app: { url: "https://example.com/app" } });
+```
+
 ### How can I display two buttons in the same row?
 
 Use `joinLastRow` in the second button

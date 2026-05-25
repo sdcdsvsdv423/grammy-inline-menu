@@ -105,6 +105,56 @@ await test('menu-template other-buttons url hidden', async () => {
 	deepStrictEqual(keyboard, []);
 });
 
+await test('menu-template other-buttons web_app', async () => {
+	const menu = new MenuTemplate('whatever');
+	menu.webApp({text: 'Button', web_app: {url: 'https://example.com/app'}});
+	const keyboard = await menu.renderKeyboard(undefined, '/');
+	deepStrictEqual(keyboard, [
+		[
+			{
+				text: 'Button',
+				web_app: {url: 'https://example.com/app'},
+			},
+		],
+	]);
+});
+
+await test('menu-template other-buttons web_app functions', async () => {
+	const menu = new MenuTemplate<string>('whatever');
+	menu.webApp({
+		text(context, path) {
+			strictEqual(context, 'foo');
+			strictEqual(path, '/');
+			return 'Button';
+		},
+		web_app(context, path) {
+			strictEqual(context, 'foo');
+			strictEqual(path, '/');
+			return {url: 'https://example.com/app'};
+		},
+	});
+	const keyboard = await menu.renderKeyboard('foo', '/');
+	deepStrictEqual(keyboard, [
+		[
+			{
+				text: 'Button',
+				web_app: {url: 'https://example.com/app'},
+			},
+		],
+	]);
+});
+
+await test('menu-template other-buttons web_app hidden', async () => {
+	const menu = new MenuTemplate('whatever');
+	menu.webApp({
+		text: 'Button',
+		web_app: {url: 'https://example.com/app'},
+		hide: () => true,
+	});
+	const keyboard = await menu.renderKeyboard(undefined, '/');
+	deepStrictEqual(keyboard, []);
+});
+
 await test('menu-template other-buttons switchToChat', async () => {
 	const menu = new MenuTemplate('whatever');
 	menu.switchToChat({text: 'Button', query: 'bar'});

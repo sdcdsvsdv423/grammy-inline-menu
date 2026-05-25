@@ -1,4 +1,4 @@
-import type {CopyTextButton} from 'grammy/types';
+import type {CopyTextButton, WebAppInfo} from 'grammy/types';
 import type {ActionFunc} from '../action-hive.ts';
 import type {ConstOrContextPathFunc, ContextPathFunc,} from '../generic-types.ts';
 import type {ButtonIconValue, ButtonStyle} from "./types.js";
@@ -45,6 +45,12 @@ export interface UrlButtonOptions<Context>
 	extends SingleButtonOptions<Context> {
 	/** Url where this button should be heading */
 	readonly url: ConstOrContextPathFunc<Context, string>;
+}
+
+export interface WebAppButtonOptions<Context>
+	extends SingleButtonOptions<Context> {
+	/** Description of the Web App launched when the button is pressed */
+	readonly web_app: ConstOrContextPathFunc<Context, Readonly<WebAppInfo>>;
 }
 
 export interface SwitchToChatOptions<Context>

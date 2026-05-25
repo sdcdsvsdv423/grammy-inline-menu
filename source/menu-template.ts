@@ -7,6 +7,7 @@ import type {
 	SingleButtonOptions,
 	SwitchToChatOptions,
 	UrlButtonOptions,
+	WebAppButtonOptions,
 } from './buttons/basic.ts';
 import type {ChooseOptions} from './buttons/choose.ts';
 import {createPaginationChoices, type PaginationOptions, type SetPageFunction,} from './buttons/pagination.ts';
@@ -175,6 +176,37 @@ export class MenuTemplate<Context> {
 			return {
 				text,
 				url,
+				...(icon_custom_emoji_id ? {icon_custom_emoji_id} : {}),
+				...(style ? {style} : {}),
+			};
+		}, options);
+	}
+
+	/** Add a web_app button to the keyboard
+	 * @example
+	 * menuTemplate.webApp({
+	 *   text: 'Open app',
+	 *   web_app: { url: 'https://example.com/app' },
+	 * });
+	 */
+	webApp(options: WebAppButtonOptions<Context>): void {
+		this.manual(async (context, path) => {
+			const text = typeof options.text === 'function'
+				? await options.text(context, path)
+				: options.text;
+			const web_app = typeof options.web_app === 'function'
+				? await options.web_app(context, path)
+				: options.web_app;
+			const icon_custom_emoji_id
+				= typeof options.iconCustomEmojiId === 'function'
+				? await options.iconCustomEmojiId(context, path)
+				: options.iconCustomEmojiId;
+			const style = typeof options.style === 'function'
+				? await options.style(context, path)
+				: options.style;
+			return {
+				text,
+				web_app,
 				...(icon_custom_emoji_id ? {icon_custom_emoji_id} : {}),
 				...(style ? {style} : {}),
 			};
